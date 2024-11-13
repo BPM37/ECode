@@ -1,33 +1,29 @@
 from downloads.user_data import pri,fe,bet,nk,nanndy,jef
 from vedic_pts import _vedicpt, _zPt
 from H import pltHRd,AR,TA,CN,LE,VI,LI,SC,SG,CP,AQ,PI
+                                               nat = _vedicpt(nanndy)
+#print(nat)                                    
+E = {'su':'AR','mo':'TA','me':'VI',            've':'PI','ma':'CP','ju':'CN','sa':'LI','ra':'GE','ke':'SG'}
 
-nat = _vedicpt(nanndy)
-#print(nat)
+D = {'su':'LI','mo':'SC','me':'PI',            've':'VI','ma':'CN','ju':'CP','sa':'AR','ra':'SG','ke':'GE'}
 
-E = {'su':'AR','mo':'TA','me':'VI',
-'ve':'PI','ma':'CP','ju':'CN','sa':'LI','ra':'GE','ke':'SG'}
-
-D = {'su':'LI','mo':'SC','me':'PI',
-'ve':'VI','ma':'CN','ju':'CP','sa':'AR','ra':'SG','ke':'GE'}
-
-pHo = {'su':'LE','mo':'CN','me':'GE',
+pltHome = {'su':'LE','mo':'CN','me':'GE',
 've':'TA','ma':'SC','ju':'PI','sa':'CP','ra':'AQ','ke':'SC'}
 
-pHoWk = {'su':'AQ','mo':'CP','me':'SG',
+pltWeekByHome = {'su':'AQ','mo':'CP','me':'SG',
 've':'SC','ma':'TA','ju':'VI','sa':'CN','ra':'LE','ke':'TA'}
 
-oS = {'su':'LE','mo':'TA','me':'VI',
+pltOff = {'su':'LE','mo':'TA','me':'VI',
 've':'LI','ma':'AɌ','ju':'SG','sa':'AQ','ra':'VI','ke':'PI'}
 
-oW = {'su':'AQ','mo':'SC','me':'PI',
+pltWeekByOff = {'su':'AQ','mo':'SC','me':'PI',
 've':'AR','ma':'LI','ju':'GE','sa':'LE','ra':'PI','ke':'VI'}
 
-hSt = {'su':'H10','mo':'H4','me':'H1',
+houseSt = {'su':'H10','mo':'H4','me':'H1',
 've':'H4','ma':'H10','ju':'H1','sa':'H7',
 'ra':'H7','ke':''}
 
-hWk = {'su':'H4','mo':'H10','me':'H7',
+houseOfWeek = {'su':'H4','mo':'H10','me':'H7',
 've':'H10','ma':'H4','ju':'H7','sa':'H1',
 'ra':'H1','ke':''}
 
@@ -35,11 +31,11 @@ comB = {'me':13,'ve':9,'ma':17,'ju':12,'sa':15}
 crit = [0,1,28,29]
 
 
-def eDebility(nat):
+def eDebi(nat):
     ed = []
     for p, s in nat.items():
         if s['syb'] not in ('A'):
-            for st, n in ((E,'E'),(D,'D'),(pHo,'Spho'),(pHoWk,'Wphwk'),(oS,'Sos'),(oW,'Wow')):
+            for st, n in ((E,'E'),(D,'D'),(pltHome,'S_pltHome'),(pltWeekByHome,'W_pltWeekByHome'),(pltOff,'S_pltOff'),(pltWeekByOff,'W_pltWeekByOff')):
                 if st[p] == s['sign']:
                     ed.append((p,n))
     return ed
@@ -49,7 +45,7 @@ def pltED(nat, pltN):
     sign = nat[pltN]['sign']
     ed = []
     if sign not in ('A'):
-        for st, n in ((E,'E'),(D,'D'),(pHo,'Spho'),(pHoWk,'Wphwk'),(oS,'Sos'),(oW,'Wow')):
+        for st, n in ((E,'E'),(D,'D'),(pltHome,'S_pltHome'),(pltWeekByHome,'W_pltWeekByHome'),(pltOff,'S_pltOff'),(pltWeekByOff,'W_pltWeekByOff')):
             if st[plt] == sign:
                 ed.append(n)
     return ed
@@ -60,12 +56,12 @@ def hS(nat, asc,  plt):
     house = eval(nat[asc]['sign'])
     for k, v in house.items():
         if pltS == v:
-            h = k#H12
-    for k1, v1 in hSt.items():
+            h = k #H12
+    for k1, v1 in houseSt.items():
         if v1 == h:
             if k1 == plt:
                 r.append((k1, 'dB'))
-    for k2, v2 in hWk.items():
+    for k2, v2 in houseOfWeek.items():
         if v2 == h:
             if k2 == plt:
                 r.append((k2, 'zDB'))
@@ -112,13 +108,14 @@ def mutual(nat):
         rl = []
         pltS = nat[plt]['sign']#sa, vi
         pltRS = pltHRd[plt]#aq,cp
-        pltN = nat[plt]['syb']
+        pltN = nat[plt]['syb'] #sa
+        if pltS not in pltHRd[pltN]:
         #sign ruled
-        for p, r in pltHRd.items():
-            for s in r:
-                if pltS == s and p not in rl:#me
-                    rl.append(p)
-        #print('for ', pltN,'sign=',pltS,'rl = ',rl)
+            for pltt, signs_plt_rules in pltHRd.items():
+                for sign in signs_plt_rules:
+                    if pltS == sign and plt not in rl:
+                        rl.append(pltt)
+
         for rp in rl:
             if nat[rp]['sign'] in pltRS and nat[rp]['syb'] not in m:
                 m.append(nat[rp]['syb'])
@@ -138,10 +135,40 @@ def moS(nat):
     return s, 'wax'
 
 
-print(eDebility(nat))
-print(pltED(nat, 'ju'))
-print(hS(nat,'mo', 'su'))
-print(combC(nat))
+print('plts_ed = ',eDebi(nat))
+print('ju_ed = ',pltED(nat, 'ju'))
+print('house strent su = ',hS(nat,'mo', 'su'))
+print('comb_cr = ',combC(nat))
 print('pltW = ',pltWar(nat))
 print('mutual = ',mutual(nat))
 print('moS = ',moS(nat))
+
+
+
+
+
+"""Error code
+def mutual(nat):
+    rl = []
+    m = []
+    for plt in ['su','mo','me','ve','ma','ju','sa','ra','ke']:
+        pltS = nat[plt]['sign']#sa, vi
+        pltRS = pltHRd[plt]#aq,cp
+        pltN = nat[plt]['syb']
+        #sign ruled
+        for p, r in pltHRd.items():
+            for s in r:
+                print('rulers = ',rulers)
+#            if pltS in r and p not in rl:#me
+                if pltS ==  and p not in rl:#me
+                rl.append(p)
+            if pltS in r[1] and p not in rl:#me
+                rl.append(p)
+        print('for ', pltN,'sign=',pltS,'rl = ',rl)
+#            for rp in rl:
+#                if nat[rp]['sign'] in pltRS and nat[rp]['syb'] not in m:
+#                    m.append(nat[rp]['syb'])
+#                    m.append(pltN)
+
+    return m
+"""
